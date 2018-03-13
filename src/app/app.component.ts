@@ -27,15 +27,21 @@ export class AppComponent implements OnInit {
         .id((d) => d['id'])
         .strength((d) => d['strength'])
       )
-      .force('charge', d3.forceManyBody().strength(-20))
+      .force('charge', d3.forceManyBody().strength(-120))
       .force('center', d3.forceCenter(width / 2, height / 2));
 
     d3.json('assets/animalkingdom.json', (err, data) => {
       if (err) { throw new Error('Bad data file!'); }
-      // console.log(data['nodes']);
 
       function getNodeColor(node) {
-        return node.level === 1 ? 'red' : 'gray'
+        if (node.level === 0) {
+          return 'red';
+        } else if (node.level === 1) {
+          return 'blue';
+        } else {
+          return 'gray';
+        }
+
       }
 
       const link = svg.append('g')
