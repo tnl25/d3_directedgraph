@@ -37,7 +37,7 @@ export class AppComponent implements OnInit {
         if (node.level === 0) {
           return 'red';
         } else if (node.level === 1) {
-          return 'blue';
+          return 'green';
         } else {
           return 'gray';
         }
