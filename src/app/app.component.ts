@@ -67,19 +67,59 @@ export class AppComponent implements OnInit {
           .on('end', dragEnded)
         );
 
-      let textElements = svg.append('g')
-        .selectAll('text')
-        .data(data['nodes'])
-        .enter()
-        .append('text')
-        .text(function (d) {
-          let text = d['label']
-          console.log(text)
-          return text
-        })
-        .attr('font-size', 15)
-        .attr('dx', 15)
-        .attr('dy', 4);
+      // const textElements = svg.append('g')
+      //   .selectAll('text')
+      //   .data(data['nodes'])
+      //   .enter()
+      //   .append('text')
+      //   .text(function (d) {
+      //     let text = d['label']
+      //     console.log(text)
+      //     return text
+      //   })
+      //   .attr('font-size', 15)
+      //   .attr('dx', 15)
+      //   .attr('dy', 4);
+
+      node.on('mouseover', function () {
+        d3.event.stopPropagation();
+
+        d3.select(this)
+          .transition()
+          .duration(1000)
+          .attr('r', 15)
+
+        let textElement = svg
+          .selectAll('.nodes')
+          .append('g')
+          .data(data['nodes'])
+          .enter()
+          .append('text')
+          .attr('class', 'text-element')
+          .text(function (d) {
+            let text = d['label']
+            console.log(text)
+            return text
+          })
+          .attr('font-size', 15)
+          .attr('dx', 15)
+          .attr('dy', 4)
+          .attr('x', function (d) { return d['x'] })
+          .attr('y', function (d) { return d['y'] })
+      })
+
+      node.on('mouseout', function () {
+        d3.select(this)
+          .transition()
+          .duration(1000)
+          .attr('r', 10)
+
+        d3.selectAll('.text-element').remove();
+
+      })
+
+
+
 
       simulation
         .nodes(data['nodes'])
@@ -99,14 +139,15 @@ export class AppComponent implements OnInit {
           .attr('cx', function (d) { return d['x']; })
           .attr('cy', function (d) { return d['y']; });
 
-        textElements
-          .attr('x', function (d) { return d['x'] })
-          .attr('y', function (d) { return d['y'] });
+        // textElements
+        //   .attr('x', function (d) { return d['x'] })
+        //   .attr('y', function (d) { return d['y'] });
+
       }
     });
 
     function dragStarted(d) {
-      if (!d3.event.active) { simulation.alphaTarget(0.3).restart(); }
+      if (!d3.event.active) { simulation.alphaTarget(0.7).restart(); }
       d.fx = d.x;
       d.fy = d.y;
     }
