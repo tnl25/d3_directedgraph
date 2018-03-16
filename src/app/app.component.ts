@@ -11,7 +11,6 @@ import * as d3 from 'd3';
 export class AppComponent implements OnInit {
   ngOnInit() {
     console.log('D3.js version:', d3['version']);
-
     this.loadForceDirectedGraph();
   }
 
@@ -90,7 +89,7 @@ export class AppComponent implements OnInit {
           .attr('r', 15)
 
         let textElement = svg
-          .selectAll('.nodes')
+          .selectAll('nodes')
           .append('g')
           .data(data['nodes'])
           .enter()
@@ -117,9 +116,6 @@ export class AppComponent implements OnInit {
         d3.selectAll('.text-element').remove();
 
       })
-
-
-
 
       simulation
         .nodes(data['nodes'])
