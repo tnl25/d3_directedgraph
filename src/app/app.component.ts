@@ -43,7 +43,8 @@ export class AppComponent implements OnInit {
 
       }
 
-      const link = svg.append('g')
+      const link = svg
+        .append('g')
         .attr('class', 'links')
         .selectAll('line')
         .data(data['links'])
@@ -52,35 +53,44 @@ export class AppComponent implements OnInit {
         .attr('stroke-width', (d) => Math.sqrt(d['value']))
         .attr('stroke', '#E5E5E5');
 
-      const node = svg.append('g')
+      const node = svg
+        .append('g')
         .attr('class', 'nodes')
-        .selectAll('circle')
+        .selectAll('.node')
         .data(data['nodes'])
         .enter()
-        .append('circle')
-        .attr('r', 10)
-        .attr('fill', getNodeColor)
+        .append('g')
+        .attr('class', 'node')
         .call(d3.drag()
           .on('start', dragStarted)
           .on('drag', dragged)
           .on('end', dragEnded)
         );
 
-      // const textElements = svg.append('g')
-      //   .selectAll('text')
-      //   .data(data['nodes'])
-      //   .enter()
-      //   .append('text')
-      //   .text(function (d) {
-      //     let text = d['label']
-      //     console.log(text)
-      //     return text
-      //   })
-      //   .attr('font-size', 15)
-      //   .attr('dx', 15)
-      //   .attr('dy', 4);
+      const circle = node.append('circle')
+        .attr('r', 10)
+        .attr('fill', getNodeColor);
 
-      node.on('mouseover', function () {
+      const voronoi = d3.voronoi()
+        .x((d) => d['x'])
+        .y((d) => d['y'])
+        .extent([[0, 0], [width, height]]);
+
+      const label = node
+        .append('text')
+        .text(function (d) {
+          return d['label']
+        })
+
+        .attr('font-size', 15)
+        .attr('dx', 15)
+        .attr('dy', 4);
+
+      const cell = node
+        .append('path')
+        .attr('class', 'cell');
+
+      circle.on('mouseover', function () {
         d3.event.stopPropagation();
 
         d3.select(this)
@@ -88,26 +98,26 @@ export class AppComponent implements OnInit {
           .duration(1000)
           .attr('r', 15)
 
-        let textElement = svg
-          .selectAll('nodes')
-          .append('g')
-          .data(data['nodes'])
-          .enter()
-          .append('text')
-          .attr('class', 'text-element')
-          .text(function (d) {
-            let text = d['label']
-            console.log(text)
-            return text
-          })
-          .attr('font-size', 15)
-          .attr('dx', 15)
-          .attr('dy', 4)
-          .attr('x', function (d) { return d['x'] })
-          .attr('y', function (d) { return d['y'] })
+        // let textElement = svg
+        //   .selectAll('nodes')
+        //   .append('g')
+        //   .data(data['nodes'])
+        //   .enter()
+        //   .append('text')
+        //   .attr('class', 'text-element')
+        //   .text(function (d) {
+        //     let text = d['label']
+        //     console.log(text)
+        //     return text
+        //   })
+        //   .attr('font-size', 15)
+        //   .attr('dx', 15)
+        //   .attr('dy', 4)
+        //   .attr('x', function (d) { return d['x'] })
+        //   .attr('y', function (d) { return d['y'] })
       })
 
-      node.on('mouseout', function () {
+      circle.on('mouseout', function () {
         d3.select(this)
           .transition()
           .duration(1000)
@@ -124,20 +134,28 @@ export class AppComponent implements OnInit {
       simulation.force<d3.ForceLink<any, any>>('link')
         .links(data['links']);
 
+      console.log('voronoi(nodes)', voronoi(data['nodes']));
+
+      var diagram = voronoi(data['nodes']);
+
       function ticked() {
+        cell
+          .data(<any>diagram)
+          .attr('d', function (d: any) { return d.length ? "M" + d.join("L") : null; });
+
         link
           .attr('x1', function (d) { return d['source'].x; })
           .attr('y1', function (d) { return d['source'].y; })
           .attr('x2', function (d) { return d['target'].x; })
           .attr('y2', function (d) { return d['target'].y; });
 
-        node
+        circle
           .attr('cx', function (d) { return d['x']; })
           .attr('cy', function (d) { return d['y']; });
 
-        // textElements
-        //   .attr('x', function (d) { return d['x'] })
-        //   .attr('y', function (d) { return d['y'] });
+        label
+          .attr('x', function (d) { return d['x'] + 10 })
+          .attr('y', function (d) { return d['y'] });
 
       }
     });
