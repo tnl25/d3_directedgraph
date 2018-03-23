@@ -41,7 +41,12 @@ export class AppComponent implements OnInit {
           return 'gray';
         }
 
-      }
+      };
+
+      // const voronoi = d3.voronoi()
+      //   .x((d) => d['x'])
+      //   .y((d) => d['y'])
+      //   .extent([[0, 0], [width, height]]);
 
       const link = svg
         .append('g')
@@ -71,24 +76,24 @@ export class AppComponent implements OnInit {
         .attr('r', 10)
         .attr('fill', getNodeColor);
 
-      const voronoi = d3.voronoi()
-        .x((d) => d['x'])
-        .y((d) => d['y'])
-        .extent([[0, 0], [width, height]]);
+      // var label = node
+      //   .selectAll('text')
+      //   .append('text')
+      //   .attr('class', 'text-element')
+      //   .text(function (d) {
+      //     return d['label']
+      //   })
+      //   .attr('font-size', 15)
+      //   .attr('dx', 15)
+      //   .attr('dy', 4)
+      //   .style('visibility', 'hidden');
 
-      const label = node
-        .append('text')
-        .text(function (d) {
-          return d['label']
-        })
-
-        .attr('font-size', 15)
-        .attr('dx', 15)
-        .attr('dy', 4);
-
-      const cell = node
-        .append('path')
-        .attr('class', 'cell');
+      // const cell = node
+      //   .append('path')
+      //   .attr('class', 'cell')
+      //   .attr('fill', 'none')
+      //   .attr('stroke', 'none')
+      //   .attr('pointer-events', 'all');
 
       circle.on('mouseover', function () {
         d3.event.stopPropagation();
@@ -96,7 +101,30 @@ export class AppComponent implements OnInit {
         d3.select(this)
           .transition()
           .duration(1000)
-          .attr('r', 15)
+          .attr('r', 20);
+
+        node
+          .append('text')
+          .attr('class', 'text-element')
+          .text(function (d) {
+            let text = d['label']
+            console.log(text)
+            return text
+          })
+          .attr('font-size', 15)
+          .attr('dx', 15)
+          .attr('dy', 4)
+          .attr('x', function (d) { return d['x'] })
+          .attr('y', function (d) { return d['y'] });
+
+
+        // d3
+        // .select(this)
+        // .select('.text-element')
+        // .transition()
+        // .duration(250)
+        // .style("opacity", 1);
+
 
         // let textElement = svg
         //   .selectAll('nodes')
@@ -125,6 +153,8 @@ export class AppComponent implements OnInit {
 
         d3.selectAll('.text-element').remove();
 
+
+
       })
 
       simulation
@@ -134,14 +164,17 @@ export class AppComponent implements OnInit {
       simulation.force<d3.ForceLink<any, any>>('link')
         .links(data['links']);
 
-      console.log('voronoi(nodes)', voronoi(data['nodes']));
 
-      var diagram = voronoi(data['nodes']);
+
+      // var diagram = voronoi(data['nodes']);
+      // var diagram = voronoi.polygons(data['nodes']);
+      // console.log('voronoi(nodes)', diagram);
+      // console.log('voronoi.polygons(nodes)', diagram);
 
       function ticked() {
-        cell
-          .data(<any>diagram)
-          .attr('d', function (d: any) { return d.length ? "M" + d.join("L") : null; });
+        // cell
+        //   .data(diagram)
+        //   .attr('d', function (d) { return d ? "M" + d.join("L") + "Z" : null });
 
         link
           .attr('x1', function (d) { return d['source'].x; })
@@ -153,9 +186,9 @@ export class AppComponent implements OnInit {
           .attr('cx', function (d) { return d['x']; })
           .attr('cy', function (d) { return d['y']; });
 
-        label
-          .attr('x', function (d) { return d['x'] + 10 })
-          .attr('y', function (d) { return d['y'] });
+        // label
+        //   .attr('x', function (d) { return d['x'] + 10 })
+        //   .attr('y', function (d) { return d['y'] });
 
       }
     });
